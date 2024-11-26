@@ -51,12 +51,16 @@ def agregar_encuesta(nombre, apellido, nacimiento, dni, cuil, nacionalidad, trab
         "estudios_superiores": estudios_superiores
     }
     
-    response = supabase.table('encuesta_personal').insert(data).execute()
-    
-    if response.get("error"):
-        st.error(f"Error al agregar datos: {response['error']}")
-    else:
-        st.success("Datos de la encuesta agregados correctamente.")
+    try:
+        response = supabase.table('encuesta_personal').insert(data).execute()
+        
+        if response.error:
+            st.error(f"Error al agregar datos: {response.error.message}")
+        else:
+            st.success("Datos de la encuesta agregados correctamente.")
+    except Exception as e:
+        st.error(f"Se produjo un error al insertar los datos: {str(e)}")
+
 
 def agregar_pregunta(carrera, pregunta):
     data = {
@@ -66,13 +70,15 @@ def agregar_pregunta(carrera, pregunta):
     
     try:
         response = supabase.table('preguntas_usuario').insert(data).execute()
-        
-        if response.get("error"):
-            st.error(f"Error al agregar pregunta: {response['error']['message']}")
+
+        # Verificar si ocurrió un error
+        if response.error:  # Acceso al atributo `error`
+            st.error(f"Error al agregar pregunta: {response.error.message}")
         else:
             st.success("Pregunta agregada correctamente.")
     except Exception as e:
         st.error(f"Se produjo un error al insertar los datos: {str(e)}")
+
 
 # Variables para almacenar puntuaciones
 puntajes = {
