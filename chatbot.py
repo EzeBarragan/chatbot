@@ -4,15 +4,16 @@ from datetime import date
 
 from diccionario import tecnicaturas
 
-from supabase import create_client
+from supabase import create_client, Client
+url = "https://spdpjswckovboheiaxum.supabase.co"
+key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwZHBqc3dja292Ym9oZWlheHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1NTI3NTEsImV4cCI6MjA0ODEyODc1MX0.VvIeU5MEiEfhAx1Lpa1NdEAAWDSZJOLNqE4RW5hLuyg"
+
+supabase: Client = create_client(url, key)
 
 min_date = date(1970, 1, 1)
 max_date = date(2024, 12, 31)
 # URL del proyecto y clave API
-supabase_url = "https://spdpjswckovboheiaxum.supabase.co"
-supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwZHBqc3dja292Ym9oZWlheHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1NTI3NTEsImV4cCI6MjA0ODEyODc1MX0.VvIeU5MEiEfhAx1Lpa1NdEAAWDSZJOLNqE4RW5hLuyg"
 
-supabase = create_client(supabase_url, supabase_key)
 
 def agregar_encuesta(nombre, apellido, nacimiento, dni, cuil, nacionalidad, trabaja, lugar_trabajo,
                      estado_civil, tiene_hijos, calle, numero, cp, provincia, localidad, correo,
