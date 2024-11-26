@@ -1,6 +1,6 @@
 import streamlit as st
 
-from datetime import datetime,date
+from datetime import date
 
 from diccionario import tecnicaturas
 
