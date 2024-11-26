@@ -1,64 +1,79 @@
 import streamlit as st
 
-import mysql.connector
-
 from datetime import datetime,date
 
 from diccionario import tecnicaturas
 
+from supabase import create_client
+
 min_date = date(1970, 1, 1)
 max_date = date(2024, 12, 31)
+# URL del proyecto y clave API
+supabase_url = "https://spdpjswckovboheiaxum.supabase.co"
+supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwZHBqc3dja292Ym9oZWlheHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1NTI3NTEsImV4cCI6MjA0ODEyODc1MX0.VvIeU5MEiEfhAx1Lpa1NdEAAWDSZJOLNqE4RW5hLuyg"
 
-# Función para conectar a MySQL
-def obtener_conexion():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",         # Usuario predeterminado de XAMPP
-        password="",         # Deja vacío si no configuraste una contraseña
-        database="encuesta"
-    )
+supabase = create_client(supabase_url, supabase_key)
 
-# Función para agregar datos de la encuesta a la base de datos
 def agregar_encuesta(nombre, apellido, nacimiento, dni, cuil, nacionalidad, trabaja, lugar_trabajo,
                      estado_civil, tiene_hijos, calle, numero, cp, provincia, localidad, correo,
                      salud, alergia, condiciones_salud, medicacion, medicacion_detalle, operacion,
                      operacion_motivo, obra_social, obra_social_detalle, afiliado,
                      secundario, instituto_secundario, estudios_superiores):
-    conn = obtener_conexion()
-    cursor = conn.cursor()
+    data = {
+        "nombre": nombre,
+        "apellido": apellido,
+        "fecha_nacimiento": nacimiento,
+        "dni": dni,
+        "cuil": cuil,
+        "nacionalidad": nacionalidad,
+        "trabaja": trabaja,
+        "lugar_trabajo": lugar_trabajo,
+        "estado_civil": estado_civil,
+        "tiene_hijos": tiene_hijos,
+        "calle": calle,
+        "numero_casa": numero,
+        "cp": cp,
+        "provincia": provincia,
+        "localidad": localidad,
+        "correo": correo,
+        "salud": salud,
+        "alergia": alergia,
+        "condiciones_salud": condiciones_salud,
+        "medicacion": medicacion,
+        "medicacion_detalle": medicacion_detalle,
+        "operacion": operacion,
+        "operacion_motivo": operacion_motivo,
+        "obra_social": obra_social,
+        "obra_social_detalle": obra_social_detalle,
+        "numero_afiliado": afiliado,
+        "secundario": secundario,
+        "instituto_secundario": instituto_secundario,
+        "estudios_superiores": estudios_superiores
+    }
     
-    # Insertar datos en la tabla
-    cursor.execute(''' 
-        INSERT INTO encuesta_personal (nombre, apellido, fecha_nacimiento, dni, cuil, nacionalidad, trabaja, lugar_trabajo,
-                              estado_civil, tiene_hijos, calle, numero_casa, cp, provincia, localidad, correo,
-                              salud, alergia, condiciones_salud, medicacion, medicacion_detalle, operacion,
-                              operacion_motivo, obra_social, obra_social_detalle, numero_afiliado,
-                              secundario, instituto_secundario, estudios_superiores)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-    ''', (nombre, apellido, nacimiento, dni, cuil, nacionalidad, trabaja, lugar_trabajo,
-                          estado_civil, tiene_hijos, calle, numero, cp, provincia, localidad, correo,
-                          salud, alergia, condiciones_salud, medicacion, medicacion_detalle, operacion,
-                          operacion_motivo, obra_social, obra_social_detalle, afiliado,
-                          secundario, instituto_secundario, estudios_superiores))
+    response = supabase.table('encuesta_personal').insert(data).execute()
+    
+    if response.get("error"):
+        st.error(f"Error al agregar datos: {response['error']}")
+    else:
+        st.success("Datos de la encuesta agregados correctamente.")
 
-    conn.commit()
-    cursor.close()
-    conn.close()
-# Función para agregar preguntas de usuario
-# Función para agregar pregunta a la base de datos
 def agregar_pregunta(carrera, pregunta):
-    conn = obtener_conexion()
-    cursor = conn.cursor()
+    data = {
+        "carrera": carrera,
+        "pregunta": pregunta
+    }
     
-    # Insertar datos en la tabla
-    cursor.execute(''' 
-            INSERT INTO preguntas_usuario (carrera, pregunta)
-            VALUES (%s, %s)
-        ''', (carrera, pregunta))
+    try:
+        response = supabase.table('preguntas_usuario').insert(data).execute()
+        
+        if response.get("error"):
+            st.error(f"Error al agregar pregunta: {response['error']['message']}")
+        else:
+            st.success("Pregunta agregada correctamente.")
+    except Exception as e:
+        st.error(f"Se produjo un error al insertar los datos: {str(e)}")
 
-    conn.commit()
-    cursor.close()
-    conn.close()
 # Variables para almacenar puntuaciones
 puntajes = {
     "Ciencia de Datos e IA": 0,
